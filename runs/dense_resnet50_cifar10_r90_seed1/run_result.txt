@@ -1,0 +1,84 @@
+Namespace(arch='resnet50', baseline=False, batch_size=128, checkpoint=None, data='../data', dataset='cifar10', decreasing_lr='50,100,150', epochs=180, gpu=1, imagenet_arch=False, input_size=32, lr=0.1, momentum=0.9, print_freq=50, prune_type='lt', pruning_times=16, random_prune=False, rate=0.9, resume=False, rewind_epoch=3, save_dir='./runs/dense_resnet50_cifar10_r90_seed1', seed=1, warmup=0, weight_decay=0.0001, workers=4)
+setup random seed = 1
+Dataset information: CIFAR-10	 45000 images for training 	 500 images for validation	
+10000 images for testing	 no normalize applied in data_transform
+Data augmentation = randomcrop(32,4) + randomhorizontalflip
+Files already downloaded and verified
+Files already downloaded and verified
+Files already downloaded and verified
+The normalize layer is contained in the network
+Sparse model created !
+* remain weight ratio =  9.999999147020855 %
+######################################## Start Standard Training ########################################
+Running Baseline : False
+Epoch = 0 	||	 Train = 19.116 % 	||	 Val = 13.760 % 	||	 Test = 12.900 %
+Epoch = 1 	||	 Train = 31.931 % 	||	 Val = 35.760 % 	||	 Test = 35.500 %
+Epoch = 2 	||	 Train = 40.329 % 	||	 Val = 46.020 % 	||	 Test = 45.740 %
+Epoch = 3 	||	 Train = 47.964 % 	||	 Val = 50.140 % 	||	 Test = 48.990 %
+Epoch = 4 	||	 Train = 55.207 % 	||	 Val = 60.280 % 	||	 Test = 59.560 %
+Epoch = 5 	||	 Train = 60.644 % 	||	 Val = 65.960 % 	||	 Test = 64.910 %
+Epoch = 6 	||	 Train = 65.147 % 	||	 Val = 69.440 % 	||	 Test = 67.350 %
+Epoch = 7 	||	 Train = 67.887 % 	||	 Val = 71.280 % 	||	 Test = 70.180 %
+Epoch = 8 	||	 Train = 70.756 % 	||	 Val = 74.200 % 	||	 Test = 71.960 %
+Epoch = 9 	||	 Train = 72.976 % 	||	 Val = 75.280 % 	||	 Test = 73.490 %
+Epoch = 10 	||	 Train = 75.064 % 	||	 Val = 76.920 % 	||	 Test = 75.820 %
+Epoch = 11 	||	 Train = 77.167 % 	||	 Val = 79.160 % 	||	 Test = 77.740 %
+Epoch = 12 	||	 Train = 79.298 % 	||	 Val = 80.160 % 	||	 Test = 78.990 %
+Epoch = 13 	||	 Train = 80.736 % 	||	 Val = 82.180 % 	||	 Test = 80.550 %
+Epoch = 14 	||	 Train = 81.838 % 	||	 Val = 80.860 % 	||	 Test = 80.310 %
+Epoch = 15 	||	 Train = 82.791 % 	||	 Val = 82.320 % 	||	 Test = 81.620 %
+Epoch = 16 	||	 Train = 83.853 % 	||	 Val = 83.760 % 	||	 Test = 82.670 %
+Epoch = 17 	||	 Train = 84.536 % 	||	 Val = 83.980 % 	||	 Test = 82.900 %
+Epoch = 18 	||	 Train = 85.422 % 	||	 Val = 85.260 % 	||	 Test = 84.040 %
+Epoch = 19 	||	 Train = 85.971 % 	||	 Val = 84.760 % 	||	 Test = 83.410 %
+Epoch = 20 	||	 Train = 86.322 % 	||	 Val = 86.040 % 	||	 Test = 84.900 %
+Epoch = 21 	||	 Train = 86.920 % 	||	 Val = 85.380 % 	||	 Test = 84.470 %
+Epoch = 22 	||	 Train = 87.587 % 	||	 Val = 86.200 % 	||	 Test = 85.510 %
+Epoch = 23 	||	 Train = 87.731 % 	||	 Val = 85.680 % 	||	 Test = 85.250 %
+Epoch = 24 	||	 Train = 88.160 % 	||	 Val = 86.000 % 	||	 Test = 85.400 %
+Epoch = 25 	||	 Train = 88.460 % 	||	 Val = 86.120 % 	||	 Test = 85.440 %
+Epoch = 26 	||	 Train = 88.624 % 	||	 Val = 86.460 % 	||	 Test = 85.590 %
+Epoch = 27 	||	 Train = 89.084 % 	||	 Val = 87.000 % 	||	 Test = 85.990 %
+Epoch = 28 	||	 Train = 89.320 % 	||	 Val = 86.360 % 	||	 Test = 85.930 %
+Epoch = 29 	||	 Train = 89.727 % 	||	 Val = 87.320 % 	||	 Test = 86.710 %
+Epoch = 30 	||	 Train = 89.642 % 	||	 Val = 86.240 % 	||	 Test = 85.420 %
+Epoch = 31 	||	 Train = 89.953 % 	||	 Val = 87.540 % 	||	 Test = 86.930 %
+Epoch = 32 	||	 Train = 90.167 % 	||	 Val = 87.300 % 	||	 Test = 87.040 %
+Epoch = 33 	||	 Train = 90.236 % 	||	 Val = 86.880 % 	||	 Test = 86.140 %
+Epoch = 34 	||	 Train = 90.249 % 	||	 Val = 87.480 % 	||	 Test = 87.550 %
+Epoch = 35 	||	 Train = 90.738 % 	||	 Val = 87.480 % 	||	 Test = 86.870 %
+Epoch = 36 	||	 Train = 90.798 % 	||	 Val = 88.000 % 	||	 Test = 87.900 %
+Epoch = 37 	||	 Train = 91.084 % 	||	 Val = 86.880 % 	||	 Test = 86.580 %
+Epoch = 38 	||	 Train = 91.064 % 	||	 Val = 87.160 % 	||	 Test = 87.480 %
+Epoch = 39 	||	 Train = 90.896 % 	||	 Val = 87.680 % 	||	 Test = 87.210 %
+Epoch = 40 	||	 Train = 91.231 % 	||	 Val = 87.840 % 	||	 Test = 86.990 %
+Epoch = 41 	||	 Train = 91.247 % 	||	 Val = 87.860 % 	||	 Test = 87.290 %
+Epoch = 42 	||	 Train = 91.527 % 	||	 Val = 87.500 % 	||	 Test = 86.840 %
+Epoch = 43 	||	 Train = 91.676 % 	||	 Val = 88.420 % 	||	 Test = 88.050 %
+Epoch = 44 	||	 Train = 91.713 % 	||	 Val = 88.460 % 	||	 Test = 88.340 %
+Epoch = 45 	||	 Train = 91.816 % 	||	 Val = 86.980 % 	||	 Test = 86.610 %
+Epoch = 46 	||	 Train = 93.100 % 	||	 Val = 89.940 % 	||	 Test = 89.730 %
+Epoch = 47 	||	 Train = 93.651 % 	||	 Val = 89.040 % 	||	 Test = 88.900 %
+Epoch = 48 	||	 Train = 93.544 % 	||	 Val = 88.580 % 	||	 Test = 88.950 %
+Epoch = 49 	||	 Train = 93.451 % 	||	 Val = 89.020 % 	||	 Test = 88.360 %
+Epoch = 50 	||	 Train = 94.904 % 	||	 Val = 91.220 % 	||	 Test = 90.550 %
+Epoch = 51 	||	 Train = 95.660 % 	||	 Val = 91.420 % 	||	 Test = 90.960 %
+Epoch = 52 	||	 Train = 96.042 % 	||	 Val = 91.680 % 	||	 Test = 91.210 %
+Epoch = 53 	||	 Train = 96.324 % 	||	 Val = 91.720 % 	||	 Test = 91.280 %
+Epoch = 54 	||	 Train = 96.411 % 	||	 Val = 92.080 % 	||	 Test = 91.350 %
+Epoch = 55 	||	 Train = 96.482 % 	||	 Val = 91.880 % 	||	 Test = 91.420 %
+Epoch = 56 	||	 Train = 96.827 % 	||	 Val = 92.060 % 	||	 Test = 91.450 %
+Epoch = 57 	||	 Train = 96.744 % 	||	 Val = 92.000 % 	||	 Test = 91.520 %
+Epoch = 58 	||	 Train = 96.920 % 	||	 Val = 92.040 % 	||	 Test = 91.560 %
+Epoch = 59 	||	 Train = 96.931 % 	||	 Val = 92.120 % 	||	 Test = 91.670 %
+Epoch = 60 	||	 Train = 96.978 % 	||	 Val = 92.200 % 	||	 Test = 91.690 %
+Epoch = 61 	||	 Train = 97.002 % 	||	 Val = 92.060 % 	||	 Test = 91.670 %
+Epoch = 62 	||	 Train = 97.209 % 	||	 Val = 92.240 % 	||	 Test = 91.760 %
+Epoch = 63 	||	 Train = 97.167 % 	||	 Val = 92.140 % 	||	 Test = 91.790 %
+Epoch = 64 	||	 Train = 97.109 % 	||	 Val = 92.140 % 	||	 Test = 91.780 %
+Epoch = 65 	||	 Train = 97.178 % 	||	 Val = 92.380 % 	||	 Test = 91.820 %
+Epoch = 66 	||	 Train = 97.189 % 	||	 Val = 92.340 % 	||	 Test = 91.700 %
+Epoch = 67 	||	 Train = 97.149 % 	||	 Val = 92.380 % 	||	 Test = 91.720 %
+Epoch = 68 	||	 Train = 97.173 % 	||	 Val = 92.380 % 	||	 Test = 91.800 %
+Epoch = 69 	||	 Train = 97.333 % 	||	 Val = 92.480 % 	||	 Test = 91.780 %
+Epoch = 70 	||	 Train = 97.378 % 	||	 Val = 92.460 % 	||	 Test = 91.800 %
