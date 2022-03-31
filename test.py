@@ -63,7 +63,7 @@ print(args)
 # checkpoint = torch.load("0.0avg_gradient_checkpoint.pth.tar", map_location = torch.device('cuda:'+str(args.gpu)))
 # baseline1 = checkpoint['result']['test_ta']
 
-checkpoint = torch.load("runs/resnet50_cifar10_r90_seed1/0.9checkpoint.pth.tar", map_location = torch.device('cuda:'+str(args.gpu)))
+checkpoint = torch.load("runs/resnet18_cifar10_r95_seed1/checkpoint.pth.tar", map_location = torch.device('cuda:'+str(args.gpu)))
 baseline2 = checkpoint['result']['test_ta']
 print("Baseline")
 print(baseline2)
@@ -71,19 +71,20 @@ print("-"*50)
 # checkpoint = torch.load("0.5avg_gradient_checkpoint.pth.tar", map_location = torch.device('cuda:'+str(args.gpu)))
 # baseline3 = checkpoint['result']['test_ta']
 
+# print(len( baseline2 + [0] * (130 - len(baseline2))))
 # checkpoint = torch.load("0.75avg_gradient_checkpoint.pth.tar", map_location = torch.device('cuda:'+str(args.gpu)))
 # baseline4 = checkpoint['result']['test_ta']
-checkpoint = torch.load("runs/dense_resnet50_cifar10_r90_seed1/0.9checkpoint.pth.tar", map_location = torch.device('cuda:'+str(args.gpu)))
+checkpoint = torch.load("runs/dense_assisted_resnet18_cifar10_r95_seed1/checkpoint.pth.tar", map_location = torch.device('cuda:'+str(args.gpu)))
 baseline4 = checkpoint['result']['test_ta']
 print("Dense Assisted")
 print(baseline4)
 
 # plot comparison curve
-plt.plot(np.arange(1, 181), baseline2 + [0] * (180 - len(baseline2)), label='Basline Training')
-# plt.plot(np.arange(100, 182), baseline2[100:] , label='alpha = 0.25')
-plt.plot(np.arange(1, 181), baseline4 + [0] * (180 - len(baseline4)), label='Dense Assisted Training')
-# plt.plot(np.arange(100, 182), baseline4[100:] , label='Baseline')
+# plt.plot(np.arange(50, 181), baseline2 + [0] * (130 - len(baseline2)), label='Basline Training')
+plt.plot(np.arange(1, 181), baseline2 , label='Baseline')
+# plt.plot(np.arange(51, 181), baseline4 + [0] * (130 - len(baseline4)), label='Dense Assisted Training')
+plt.plot(np.arange(1, 181), baseline4 , label='Dense-assisted')
 # plt.plot(np.arange(1, 183), baseline4 + [0] * (183 - len(baseline4)), label='alpha = 0.75')
 plt.legend()
-plt.savefig("plots/comparison_resnet50_cifar10_r90.png")
+plt.savefig("plots/comparison_resnet_cifar10_r95.png")
 plt.close()

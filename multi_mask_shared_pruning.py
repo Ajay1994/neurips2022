@@ -1,32 +1,11 @@
 """
-    Create multiple prune masks and a random mask
-    
-    python -u shared_pruning.py \
+  python -u shared_pruning.py \
     --data ../data \
     --dataset cifar100 \
     --arch resnet20s \
     --seed 1 \
-    --rate 0.8 \
-    --save_dir ./runs/shared_seed1_resnet20s_cifar100_rate90
-    
-    python -u shared_pruning.py --data ../data --dataset cifar100 --arch resnet18 --seed 1 --rate 0.9 --save_dir ./runs/shared_seed1_resent18_cifar100_rate90_schedule2 > ./runs/shared_seed1_resent18_cifar100_rate90_schedule2/shared_run1.txt
-    
-    sharedII - baseline
-    rate90_new : > 60 - apply train
-    scheduled : < 50
-   
-    
-    python -u shared_pruning.py --baseline --data ../data --dataset cifar100 --arch resnet18 --seed 1 --rate 0.8 --save_dir ./runs/resnet20s_cifar100_r80_seed1 --gpu 0 > ./runs/resnet20s_cifar100_r80_seed1/run_result.txt [30954]
-    
-    
-    python -u shared_pruning.py --data ../data --dataset cifar100 --arch resnet18 --seed 1 --rate 0.8 --save_dir ./runs/dense_resnet20s_cifar100_r80_seed1 --gpu 1 > ./runs/dense_resnet20s_cifar100_r80_seed1/run_result.txt [28977]
-    
-    python -u shared_pruning.py --baseline --data ../data --dataset cifar100 --arch resnet18 --seed 1 --rate 0.8 --save_dir ./runs/resnet20s_cifar100_r80_seed1 --gpu 0 > ./runs/resnet20s_cifar100_r80_seed1/run_result.txt [30954]
-    
-    python -u shared_pruning.py --data ../data --dataset cifar10 --arch resnet18 --seed 1 --rate 0.8 --save_dir ./runs/dense_resnet18_cifar10_r80_seed1 --gpu 1 > ./runs/dense_resnet18_cifar10_r80_seed1/run_result.txt [26895]
-    
-    python -u shared_pruning.py --baseline --data ../data --dataset cifar10 --arch resnet18 --seed 1 --rate 0.8 --save_dir ./runs/resnet18_cifar10_r80_seed1 --gpu 3 > ./runs/resnet18_cifar10_r80_seed1/run_result.txt [27697]
-
+    --rate 0.9 \
+    --save_dir ./runs/mm_resnet20s_cifar100_rate90
 """
 import os
 import sys
@@ -78,9 +57,9 @@ parser.add_argument('--baseline', action="store_true", help="Use the dense gradi
 
 ##################################### Training setting #################################################
 parser.add_argument('--batch_size', type=int, default=128, help='batch size')
-parser.add_argument('--lr', default=100, type=float, help='initial learning rate')
+parser.add_argument('--lr', default=0.1, type=float, help='initial learning rate')
 parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
-parser.add_argument('--weight_decay', default=1e-5, type=float, help='weight decay')
+parser.add_argument('--weight_decay', default=1e-4, type=float, help='weight decay')
 parser.add_argument('--epochs', default=180, type=int, help='number of total epochs to run')
 parser.add_argument('--warmup', default=0, type=int, help='warm up epochs')
 parser.add_argument('--print_freq', default=50, type=int, help='print frequency')
@@ -108,22 +87,19 @@ def prune_and_extract(m, rate):
     mask = extract_mask(m.state_dict())
     return mask
 
-def weight_copy(model):
-    weight_dict = dict()
-    for name, m in model.named_modules():
-        if isinstance(m, nn.Conv2d):
-            weight_dict[name] = m.weight.data.clone()
-    return weight_dict
-
-def restore_weight(model, weight_dict):
-    for name, m in model.named_modules():
-        if isinstance(m, nn.Conv2d):
-            m.weight.data = weight_dict[name].clone()
 def deep_copy(m):
     params = deepcopy(m.state_dict())
     return params
 
 
+def grow_mask(mask_dict, percent):
+
+    new_dict = {}
+    for key in mask_dict.keys():
+
+        new_dict[key] = 1 - mask_dict[key]
+        
+    return new_dict
 
 def main():
     global args, best_sa, fopen, test_loader, alpha
@@ -139,7 +115,6 @@ def main():
     model, train_loader, val_loader, test_loader = setup_model_dataset(args)
     model.cuda()
     dense_init = deep_copy(model)
-    weight_dict = weight_copy(model)
     torch.save(dense_init, os.path.join(args.save_dir, 'init_weight.pt'))
     
     criterion = nn.CrossEntropyLoss()
@@ -166,30 +141,14 @@ def main():
     print('######################################## Start Standard Training ########################################')
     print("Running Baseline : {}".format(args.baseline))
     for epoch in range(start_epoch, args.epochs):
-        if args.baseline:
-            acc = train_base(train_loader, model, criterion, optimizer, epoch)
-        else:
-            if epoch < 46:
-                acc, weight_dict = train(train_loader, model, weight_dict, optimizer, criterion, mask90, epoch)
-            else:
-                acc = train_base(train_loader, model, criterion, optimizer, epoch)
+        
+        acc = train_base(train_loader, model, criterion, optimizer, epoch)
                 
-        check_sparsity(model)
-
-        print("-"*100)
-        for name, m in model.named_modules():
-            if isinstance(m, nn.Conv2d):
-                print(m.weight_orig[0][0])
-                print(m.weight[0][0])
-                break
-        print("-"*100)
-
-        acc =  validate(train_loader, model, criterion)
+        # check_sparsity(model)
         tacc = validate(val_loader, model, criterion)
         test_tacc = validate(test_loader, model, criterion)
-        print("Epoch = {} \t||\t Train = {:.7f} % \t||\t Val = {:.7f} % \t||\t Test = {:.7f} %".format(epoch, acc, tacc, test_tacc))
-        if epoch > 2:
-            sys.exit(0)
+        print("Epoch = {} \t||\t Train = {:.3f} % \t||\t Val = {:.3f} % \t||\t Test = {:.3f} %".format(epoch, acc, tacc, test_tacc))
+        
         scheduler.step()
         
         all_result['train_ta'].append(acc)
@@ -259,29 +218,27 @@ def train_base(train_loader, model_sparse, criterion, optimizer, epoch):
     # print('Time taken : {:.2f} sec \t||\t Train_accuracy {:.3f}'.format((end-start), top1.avg))
     return top1.avg
 
-
-
-def train(train_loader, model, weight_dict, optimizer, criterion, mask90, epoch):
+def train(train_loader, model, optimizer, criterion, mask90, epoch):
     global alpha
     losses = AverageMeter()
     top1 = AverageMeter()
     model.train()
+
+    prune_rate = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+    rate = random.randint(0, len(prune_rate) - 1)
+
+
+
     start = time.time()
-
-    remove_prune(model)
-    restore_weight(model, weight_dict)
-
     for i, (image, target) in tqdm(enumerate(train_loader)):
-        # print("*"*100)
-        # for name, m in model.named_modules():
-        #     if isinstance(m, nn.Conv2d):
-        #         print(m.weight[0][0])
-        #         break
-        # print("*"*100)
         image = image.cuda()
         target = target.cuda()
-        # print("-"*100)
         
+
+        try:
+            remove_prune(model)
+        except:
+            None
         output = model(image)
         loss = criterion(output, target)
         optimizer.zero_grad()
@@ -293,25 +250,10 @@ def train(train_loader, model, weight_dict, optimizer, criterion, mask90, epoch)
                 grad = m.weight.grad.data.clone().cuda()
                 grad_dict[name] = grad
                 m.weight.grad = None
-
-        # print("$"*100)
-        # for name, m in model.named_modules():
-        #     if isinstance(m, nn.Conv2d):
-        #         print(m.weight[0][0])
-        #         break
-        # print("$"*100)
-
-        weight_dict = weight_copy(model)
+       
         with torch.no_grad():
             prune_model_custom(model, mask90)
-        
-        # print("%"*100)
-        # for name, m in model.named_modules():
-        #     if isinstance(m, nn.Conv2d):
-        #         print(m.weight[0][0])
-        #         break
-        # print("%"*100)
-
+            
         output = model(image)
         loss = criterion(output, target)
         optimizer.zero_grad()
@@ -326,47 +268,15 @@ def train(train_loader, model, weight_dict, optimizer, criterion, mask90, epoch)
         prec1 = accuracy(_output.data, target)[0]
         losses.update(_loss.item(), image.size(0))
         top1.update(prec1.item(), image.size(0))
-
-        # for name, m in model.named_modules():
-        #     if isinstance(m, nn.Conv2d):
-        #         print(m.weight[0][0])
-        #         break
-        remove_prune(model)
-        # print("Doing Remove Prune")
-        # for name, m in model.named_modules():
-        #     if isinstance(m, nn.Conv2d):
-        #         print(m.weight[0][0])
-        #         break
-
-        # print("Hello Before Restore : {}".format(i))
-
-        # restore_weight(model, weight_dict)
         
-        # for name, m in model.named_modules():
-        #     if isinstance(m, nn.Conv2d):
-        #         print(m.weight[0][0])
-        #         break
-        # print("Hello After Restore : {}".format(i))    
+        
+        remove_prune(model)
         optimizer.step()
         
-        # for name, m in model.named_modules():
-        #     if isinstance(m, nn.Conv2d):
-        #         print(m.weight[0][0])
-        #         break
-        # print("Hello After Optimizer Step : {}".format(i))
-        # check_sparsity(model)
-        # if i == 2:
-        #     sys.exit(0)
-    weight_dict = weight_copy(model)
-    print("-"*100)
-    for name, m in model.named_modules():
-        if isinstance(m, nn.Conv2d):
-            print(m.weight[0][0])
-            break 
-    print("-"*100)
+
     prune_model_custom(model, mask90)
     end = time.time()
-    return top1.avg, weight_dict
+    return top1.avg
 
 def validate(val_loader, model, criterion):
     """

@@ -26,7 +26,7 @@
     python -u shared_pruning.py --data ../data --dataset cifar10 --arch resnet18 --seed 1 --rate 0.8 --save_dir ./runs/dense_resnet18_cifar10_r80_seed1 --gpu 1 > ./runs/dense_resnet18_cifar10_r80_seed1/run_result.txt [26895]
     
     python -u shared_pruning.py --baseline --data ../data --dataset cifar10 --arch resnet18 --seed 1 --rate 0.8 --save_dir ./runs/resnet18_cifar10_r80_seed1 --gpu 3 > ./runs/resnet18_cifar10_r80_seed1/run_result.txt [27697]
-    
+
 """
 import os
 import sys
@@ -139,7 +139,7 @@ def main():
     optimizer = torch.optim.SGD(model.parameters(), args.lr,
                                 momentum=args.momentum,
                                 weight_decay=args.weight_decay)
-    scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=decreasing_lr, gamma=0.01)
+    scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=decreasing_lr, gamma=0.1)
     
     all_result = {}
     all_result['train_ta'] = []
@@ -276,10 +276,6 @@ def train(train_loader, model, optimizer, criterion, mask90, epoch):
         
         for name, m in model.named_modules():
             if isinstance(m, nn.Conv2d):
-                # mask_weight = m.weight.data.abs().clone()
-                # s_mask = mask_weight.gt(0).float().cuda()
-                # print(s_mask)
-                # grad_dict[name] = grad_dict[name] * s_mask
                 m.weight_orig.grad = m.weight_orig.grad + (alpha * grad_dict[name])
         
         _output = output.float()
@@ -287,7 +283,6 @@ def train(train_loader, model, optimizer, criterion, mask90, epoch):
         prec1 = accuracy(_output.data, target)[0]
         losses.update(_loss.item(), image.size(0))
         top1.update(prec1.item(), image.size(0))
-        
         
         remove_prune(model)
         optimizer.step()
@@ -338,10 +333,10 @@ def validate(val_loader, model, criterion):
 #############################################################################################
 
 def save_checkpoint(state, is_SA_best, save_path, pruning, filename='checkpoint.pth.tar'):
-    filepath = os.path.join(save_path, str(pruning)+filename)
+    filepath = os.path.join(save_path, filename)
     torch.save(state, filepath)
     if is_SA_best:
-        shutil.copyfile(filepath, os.path.join(save_path, str(pruning)+'model_SA_best.pth.tar'))
+        shutil.copyfile(filepath, os.path.join(save_path, 'model_SA_best.pth.tar'))
 
 def warmup_lr(epoch, step, optimizer, one_epoch_step):
 
